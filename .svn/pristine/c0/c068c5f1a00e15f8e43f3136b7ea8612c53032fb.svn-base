@@ -1,0 +1,381 @@
+<!--  -->
+<template>
+<div class='problem'>
+  <div class='top'>
+    <el-button type="primary" class="add_btn" @click="addModal = true">+添加问题</el-button>
+    <el-button type="primary" class="code" @click="helpClick">帮助中心标签</el-button>
+  </div>
+  
+
+<el-dialog title="添加问题" :visible.sync="addModal">
+  <el-form :model="addForm" label-width="200px">
+    <el-form-item label="问题" >
+      <el-input v-model="addForm.question" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="答案内容">
+      <el-input v-model="addForm.answerContent" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="答案内容类型">
+      <el-select v-model="addForm.answerType" placeholder="请选择">
+        <el-option label="文本" value="text"></el-option>
+        <el-option label="链接地址" value="url"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="问题标签" >
+      <el-input v-model="addForm.tag" autocomplete="off"></el-input>(多个标签用英文逗号隔开)
+    </el-form-item>
+    <el-form-item label="问题分类" class="demo-form-inline">
+      <table>
+        <tr>
+          <td>
+            <el-checkbox label="help_center" v-model="addForm.data1.type">帮助中心</el-checkbox>
+          </td>
+          <td>
+              <el-form-item label="在所属分类中的排序">
+                <el-input v-model="addForm.data1.sort" autocomplete="off" class="listinput"></el-input>
+              </el-form-item>
+          </td>
+          <td>
+            <el-form-item label="是否在手环App默认展示">
+              <el-select v-model="addForm.data1.defaultDisplay" placeholder="请选择">
+                <el-option label="展示" value="1"></el-option>
+                <el-option label="不展示" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <el-checkbox label="customer_service" v-model="addForm.data2.type">在线客服</el-checkbox>
+          </td>
+          <td>
+              <el-form-item label="在所属分类中的排序">
+                <el-input v-model="addForm.data2.sort" autocomplete="off" class="listinput"></el-input>
+              </el-form-item>
+          </td>
+          <td>
+            <el-form-item label="是否在手环App默认展示">
+              <el-select v-model="addForm.data2.defaultDisplay" placeholder="请选择">
+                <el-option label="展示" value="1"></el-option>
+                <el-option label="不展示" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <el-checkbox label="drive_safely" v-model="addForm.data3.type">安全驾驶</el-checkbox>
+          </td>
+           <td>
+              <el-form-item label="在所属分类中的排序">
+                <el-input v-model="addForm.data3.sort" autocomplete="off" class="listinput"></el-input>
+              </el-form-item>
+          </td>
+          <td>
+            <el-form-item label="是否在手环App默认展示">
+              <el-select v-model="addForm.data3.defaultDisplay" placeholder="请选择">
+                <el-option label="展示" value="1"></el-option>
+                <el-option label="不展示" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+          </td>
+        </tr>
+      </table>
+      
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="addModal = false" style="background-color:white;color:black;" class="btn">取 消</el-button>
+    <el-button type="primary" @click="addQuestion" class="btn">确 定</el-button>
+  </div>
+</el-dialog>
+
+<el-dialog title="更新问题" :visible.sync="updateModal">
+  <el-form :model="updateForm">
+    <el-form-item label="问题" :label-width="formLabelWidth">
+      <el-input v-model="updateForm.question" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="答案内容" :label-width="formLabelWidth">
+      <el-input v-model="updateForm.answerContent" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="答案内容类型" :label-width="formLabelWidth">
+      <el-select v-model="updateForm.answerType" placeholder="请选择">
+        <el-option label="文本" value="text"></el-option>
+        <el-option label="链接地址" value="url"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="问题标签" :label-width="formLabelWidth">
+      <el-input v-model="updateForm.name" autocomplete="off"></el-input>(多个标签用英文逗号隔开)
+    </el-form-item>
+    <el-form-item label="问题分类" :label-width="formLabelWidth">
+      <el-checkbox-group v-model="checkList">
+        <el-checkbox label="help_center">帮助中心</el-checkbox>
+        <el-checkbox label="customer_service">在线客服</el-checkbox>
+        <el-checkbox label="drive_safely">安全驾驶</el-checkbox>
+      </el-checkbox-group> 
+    </el-form-item>
+    <el-form-item label="在所属分类中的排序" :label-width="formLabelWidth">
+      <el-input v-model="updateForm.name" autocomplete="off"></el-input>
+    </el-form-item>
+      <el-form-item label="是否在手环App默认展示" :label-width="formLabelWidth">
+      <el-select v-model="updateForm.region" placeholder="请选择">
+        <el-option label="展示" value="1"></el-option>
+        <el-option label="不展示" value="0"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="updateModal = false">取 消</el-button>
+    <el-button type="primary" @click="updateModal = false">确 定</el-button>
+  </div>
+</el-dialog>
+
+<div class='listTable'>
+  <el-table :data="problemData" border style="width:100%" header-cell-class-name="headerRow">
+    <el-table-column prop="date" label="问题" width="180"></el-table-column>
+    <el-table-column prop="name" label="答案内容" width="180"></el-table-column>
+    <el-table-column prop="address" label="答案内容类型" width="180"></el-table-column>
+    <el-table-column prop="name" label="问题标签" width="180"></el-table-column>
+    <el-table-column prop="name" label="创建时间" width="180"></el-table-column>
+    <el-table-column prop="name" label="更新时间" width="180"></el-table-column>
+    <el-table-column prop="name" label="问题所属" width="180"></el-table-column>
+    <el-table-column prop="name" label="是否在app中展示" width="180"></el-table-column>
+    <el-table-column prop="name" label="操作" >
+       <template slot-scope="scope">
+          <el-button  @click="editArticle(scope.row)" type="text" size="small">编辑文章</el-button>
+          <el-button  @click="update(scope.row)" type="text" size="small">修改</el-button>
+          <el-button  @click="deleted(scope.row)" type="text" size="small" >删除</el-button>
+        </template>
+    </el-table-column>
+  </el-table>
+</div>
+
+<el-dialog title="帮助中心标签" :visible.sync="helpModal">
+  <el-form :model="helpForm">
+    <el-form-item label="问题标签:" :label-width="formLabelWidth">
+      <el-card class="box-card">
+      <el-input v-model="tagList" autocomplete="off" type="textarea" readonly="readonly"></el-input>  
+      </el-card>
+    </el-form-item>
+    <el-form-item label="更新问题标签" :label-width="formLabelWidth">
+      <el-input v-model="helpForm.tag" autocomplete="off" type="textarea"></el-input>
+    </el-form-item>
+  </el-form>
+  <el-dialog
+      width="30%"
+      title="更新帮助中心标签"
+      :visible.sync="innerhelpModal"
+      append-to-body>
+      <span>确定要更新帮助中心标签吗？注意:你提交的标签将直接全部替换已存在的标签</span>
+      <div slot="footer" class="dialog-footer" style="text-align:center;">
+        <el-button @click="innerhelpModal=false" class="btn" style="background-color:white;color:black;">取 消</el-button>
+        <el-button type="primary" @click="updateTag" class="btn">确  定</el-button>
+      </div>
+    </el-dialog>
+  <div slot="footer" class="dialog-footer" style="text-align:center;">
+    <!-- <el-button @click="dialogFormVisible = false" class="btn" style="background-color:white;color:black;">取 消</el-button> -->
+    <el-button type="primary" @click="innerhelpModal=true" class="btn">更   新</el-button>
+  </div>
+</el-dialog>
+
+
+</div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+//import引入的组件需要注入到对象中才能使用
+components: {},
+data() {
+//这里存放数据
+return {
+  addModal: false,
+  updateModal: false,
+  helpModal:false,
+  innerhelpModal:false,
+  addForm: {
+          question: '',
+          answerContent: '',
+          answerType: '',
+          tag: '',
+          data1:{
+              type: false,//'help_center',
+              sort: 0,
+              defaultDisplay: "1"
+          },
+          data2:{
+              type: false,//'customer_service',
+              sort: 0,
+              defaultDisplay: "1"
+          },
+          data3:{
+              type: false,//'drive_safely',
+              sort: 0,
+              defaultDisplay: "1"
+          },
+          categories:[],
+        },
+  updateForm: {
+          question: '',
+          answerContent: '',
+          answerType: '',
+          tag: '',
+          type: '',
+          sort: 0,
+          defaultDisplay: 0,
+        },
+  helpForm:{
+    tag:""
+  },
+  formLabelWidth: '200px',
+  checkList: [''],
+  problemData:[],
+  tagList:""
+};
+},
+//监听属性 类似于data概念
+computed: {},
+//监控data中的数据变化
+watch: {},
+//方法集合
+methods: {
+  addQuestion(){
+      console.log("data1.type",this.addForm.data1.type);
+      console.log("data1.sort",this.addForm.data1.sort);
+      console.log("data1.defaultDisplay",this.addForm.data1.defaultDisplay);
+      if(this.addForm.data1.type==false&&this.addForm.data2.type==false&&this.addForm.data3.type==false){
+        this.warning("问题分类至少应选择一个！");
+        return;
+      }
+      if(this.addForm.data1.type==true){
+        this.addForm.data1.type="help_center";
+      }
+
+
+      // this.$axios({
+      //   method:"POST",
+      //   url:`${this.$ip}/v1/management/questions/add`,
+      //   data:{
+      //     question: this.addForm.question,
+      //     answerContent: this.addForm.answerContent,
+      //     answerType: this.addForm.answerType,
+      //     tag: this.addForm.tag,
+      //     categories:this.categories
+      //   }        
+      // }).then(res => {
+      //   if(res.data){
+      //     let data = res.data;
+      //     if(data.code == "E_0000_0000"){
+      //       this.success('添加成功！')
+      //       this.addModal = false;
+      //       this.getphraseList();
+      //     }else if(data.code == "E_0000_0402"){
+      //       this.Timeoutalert()
+      //     }else{
+      //       this.warning(data.msg)
+      //     }
+      //   }
+      // }).catch(err => {
+      //   console.log(err)
+      // })
+  },
+  getQuestionList(){
+    this.$axios({
+        method:"get",
+        url:`${this.$ip}/v1/management/topics?locationCode=${this.locationCode}`        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.topicList = data.data;
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  helpClick(){
+    this.helpModal = true;
+  },
+  getTags(){
+    this.$axios({
+        method:"get",
+        url:`${this.$ip}/v1/management/questions/tags`        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.tagList = data.data;
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  updateTag(){
+    this.$axios({
+        method:"POST",
+        url:`${this.$ip}/v1/management/questions/tags/modify`,
+        data:{
+          tag: this.helpForm.tag
+        }   
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.success("帮助中心标签更新成功！");
+            this.getTags();
+            //this.tagList = data.data;
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  success(val) {
+    this.$message({
+      message: val,
+      type: "success"
+    });
+  },
+  warning(val) {
+    this.$message.error(`Error：${val}`);
+  }
+
+},
+//生命周期 - 创建完成（可以访问当前this实例）
+created() {
+  this.getTags();
+},
+//生命周期 - 挂载完成（可以访问DOM元素）
+mounted() {
+
+},
+beforeCreate() {}, //生命周期 - 创建之前
+beforeMount() {}, //生命周期 - 挂载之前
+beforeUpdate() {}, //生命周期 - 更新之前
+updated() {}, //生命周期 - 更新之后
+beforeDestroy() {}, //生命周期 - 销毁之前
+destroyed() {}, //生命周期 - 销毁完成
+activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
+}
+</script>
+<style lang='less' scoped>
+//@import url(); 引入公共css类
+@import '/css/problem.less';
+</style>

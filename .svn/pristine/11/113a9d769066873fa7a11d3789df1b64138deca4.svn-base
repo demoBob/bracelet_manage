@@ -1,0 +1,165 @@
+<!--  -->
+<template>
+<div>
+<div class="top">
+  <img src="../../static/images/logo.png" class="company_logo"/>
+  <label class="title">CEM运动健康管理系统</label>
+  <!-- <el-tooltip class="item" effect="light" content="登出系统" placement="bottom">
+      <img src="../../static/images/user.png" class="user_logo" alt="登出系统" @click="dialogVisible = true"/>
+  </el-tooltip> -->
+  <el-popover
+  placement="bottom"
+  trigger="hover"
+  popper-class="popover"
+  width="120"
+  v-model="visible">
+  <span class="name" @click="dialogFormVisible = true">修改密码</span><span class="name" v-html="'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;退出登录'" @click="dialogVisible = true"></span>
+  <img src="../../static/images/user.png" class="user_logo" alt="登出系统" slot="reference"/>
+</el-popover>
+  <label class="user">admin</label>
+</div>
+<div class='layout'>
+  <div class="side clearfix">
+      <router-link to="/resource" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-dashboard.png" alt=""> -->
+        <div>资源</div>
+      </router-link>
+      <router-link to="/fixed_phrase" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>固定短语</div>
+      </router-link>
+       <router-link to="/topic" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>专题管理</div> 
+      </router-link>
+      <router-link to="/article" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>文章管理</div>
+      </router-link>
+      <router-link to="/problem" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>问题管理</div>
+      </router-link>
+    </div>
+    <router-view class="main"></router-view>
+</div>
+
+<el-dialog
+  title="退出登录"
+  :visible.sync="dialogVisible"
+  width="30%">
+  <span>确定要退出登录吗？</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="loginOut">确 定</el-button>
+  </span>
+</el-dialog>
+
+<el-dialog title="修改密码" :visible.sync="dialogFormVisible" width="30%" class="update">
+  <el-form>
+    <el-form-item label="旧密码:">
+      <el-input v-model="password"></el-input>
+    </el-form-item>
+    <el-form-item label="新密码:">
+      <el-input v-model="newPassword"></el-input>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="updated">确 定</el-button>
+  </div>
+</el-dialog>
+
+</div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+name:'layout',
+//import引入的组件需要注入到对象中才能使用
+components: {},
+data() {
+//这里存放数据
+return {
+  dialogVisible: false,
+  visible:false,
+  dialogFormVisible:false,
+  password:"",
+  newPassword:""
+};
+},
+//监听属性 类似于data概念
+computed: {},
+//监控data中的数据变化
+watch: {},
+//方法集合
+methods: {
+  loginOut(){
+    localStorage.clear();
+    this.$router.push("/Login")
+
+  },
+  updated(){
+    if(!this.password){
+      this.warning("请输入新密码！")
+    }else if(!this.newPassword){
+      this.warning("请输入旧密码！")
+    }else{
+      let password = this.$md5(this.password).toUpperCase();
+      let newPassword = this.$md5(this.newPassword).toUpperCase();
+      this.$axios({
+        method:"post",
+        url:`${this.$ip}/v1/management/users/password/update`,
+        data:{
+          password:password,
+          newPassword:newPassword,
+        }
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.success("修改密码成功！")
+            this.dialogFormVisible = false;
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  },
+  success(val) {
+    this.$message({
+      message: val,
+      type: "success"
+    });
+  },
+  warning(val) {
+    this.$message.error(`Error：${val}`);
+  }
+},
+//生命周期 - 创建完成（可以访问当前this实例）
+created() {
+
+},
+//生命周期 - 挂载完成（可以访问DOM元素）
+mounted() {
+
+},
+beforeCreate() {}, //生命周期 - 创建之前
+beforeMount() {}, //生命周期 - 挂载之前
+beforeUpdate() {}, //生命周期 - 更新之前
+updated() {}, //生命周期 - 更新之后
+beforeDestroy() {}, //生命周期 - 销毁之前
+destroyed() {}, //生命周期 - 销毁完成
+activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
+}
+</script>
+<style lang='less' scoped>
+//@import url(); 引入公共css类
+@import '/css/layout.less';
+</style>

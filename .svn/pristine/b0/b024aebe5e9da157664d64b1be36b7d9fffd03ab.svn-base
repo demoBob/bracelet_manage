@@ -1,0 +1,106 @@
+.top {
+  width:100%;
+  height:60px;
+  margin:0 auto;
+  background-color: #d3d3d4;
+  line-height: 60px;
+  // border:1px solid green;
+  .title{
+    font-size: 22px;
+  }
+  .user{
+    font-size: 16px;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+  }
+  .company_logo {
+    width: 180px;
+    position: absolute;
+    top: 15px;
+    left: 20px;
+  }
+  .user_logo {
+    width: 40px;
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 101;
+    outline:none;
+  } 
+    
+}
+.layout {
+  display: flex;
+  position: relative;
+  padding: 0px;
+  height:100%;
+  .open,.active{
+    color: #afb1b2;
+    background-color: #0095c6;
+  }
+  .main{
+    flex: 1;
+    height: calc(100% - 70px);
+    overflow: auto;
+    // border:1px solid green;
+    // width: calc(100% - 228px);
+  }
+  .side{
+    width: 222px;
+    height: calc(100% - 70px);
+    // border: 1px solid #31738b;
+    background-color: #31738b;
+    // border-radius: 5px;
+    margin: 0px;
+    overflow-x: hidden;
+    .nav{
+      margin: 1px 0px;
+      float: left;
+      width: 100%;
+      height: 47px;
+      line-height: 47px;
+      padding-left: 50px;
+      position: relative;
+      cursor: pointer;
+      color: white;
+      &:hover{
+        color: #afb1b2;
+        background-color: rgba(0, 149, 198, 1);
+      }
+      img,div{
+        float: left;
+      }
+      div:last-child{
+        font-size: 18px;
+      }
+      img{
+        position: absolute;
+        top: 10px;
+        left: 11px;
+        width: 30px;
+      }
+    }
+  }
+}
+
+ .popover{
+  .name{
+    cursor: pointer;
+    &:hover{
+      color: rgba(0, 149, 198, 1);
+    }
+  }
+}
+
+.update{
+  /deep/ .el-input{
+    width: 250px;
+    float: left;
+  }
+
+  /deep/ .el-form-item__label{
+    margin-left: 100px;
+  }
+}

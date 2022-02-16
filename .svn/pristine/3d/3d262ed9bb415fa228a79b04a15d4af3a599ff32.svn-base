@@ -1,0 +1,507 @@
+<!--  -->
+<template>
+<div class="resource">
+  <div class="top">
+    <el-button type="primary" @click="create">添加资源</el-button>
+    <el-select v-model="code" class="code" placeholder="全部" @change="getresourcesList">
+          <el-option  label="健康饮酒的正确姿势" value="0001"></el-option>
+          <el-option  label="含酒精的食品/药品/用品" value="0002"></el-option>
+          <el-option  label="客服路卡头像" value="0003"></el-option>
+          <el-option  label="客服人工头像" value="0004"></el-option>
+    </el-select>
+  </div>
+  <div class="listTable">
+      <el-table
+      :data="resourcesList"
+      border
+      style="width: 100%"
+      max-height="650">
+      <el-table-column
+        prop="resourceId"
+        label="资源ID"
+        >
+      </el-table-column>
+      <el-table-column
+        prop="code"
+        label="资源编码"
+        >
+      </el-table-column>
+      <el-table-column
+        prop="title"
+        label="资源标题">
+      </el-table-column>
+       <el-table-column
+        prop="content"
+        label="资源内容">
+      </el-table-column>
+      <el-table-column
+        prop="createdTime"
+        label="创建时间">
+      </el-table-column>
+       <el-table-column
+        prop="address"
+        label="资源附件图片">
+        <template slot-scope="scope">
+          <ul>
+            <li v-for="(item,index) in scope.row.attachments" :key="index">
+              <img :src="item.attachmentUrl" />
+            </li>
+          </ul>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="updatedTime"
+        label="修改时间">
+      </el-table-column>
+       <el-table-column
+        label="操作">
+        <template slot-scope="scope">
+          <el-button @click="update(scope.row)" type="text" size="small">修改</el-button>
+          <el-button @click="deleted(scope.row)" type="text" size="small" >删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+  <el-dialog title="添加资源" :visible.sync="addModal" :close-on-click-modal="false"  center>
+    <el-form  ref="addForm"  label-position="right" label-width="100px" >
+      <el-form-item label="资源标题">
+        <el-input v-model="addForm.title" placeholder="请输入资源标题"></el-input>
+      </el-form-item>
+      <el-form-item label="资源类型" >
+        <el-select v-model="addForm.code"  placeholder="请选择">
+          <el-option  label="健康饮酒的正确姿势" value="0001"></el-option>
+          <el-option  label="含酒精的食品/药品/用品" value="0002"></el-option>
+          <el-option  label="客服路卡头像" value="0003"></el-option>
+          <el-option  label="客服人工头像" value="0004"></el-option>
+        </el-select>
+      </el-form-item>                  
+      <el-form-item label="资源内容">
+          <el-input type="textarea"  v-model="addForm.content"></el-input>
+      </el-form-item>
+      <el-form-item label="资源附件">
+          <el-upload
+            action="#"
+            list-type="picture-card"
+            :on-remove="handleRemove"
+            accept=".jpg,.jpeg,.png"
+            :on-change="handleChange"
+            :http-request="httpRequest">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="sure">
+      <el-button type="primary" @click="created">立即添加</el-button>
+      <el-button @click="clear">重置</el-button>
+    </div>
+  </el-dialog>
+
+  <el-dialog title="修改资源" :visible.sync="updateModal" :close-on-click-modal="false"  center>
+    <el-form  ref="updateForm"  label-position="right" label-width="100px" >
+      <el-form-item label="资源标题">
+        <el-input v-model="updateForm.title" placeholder="请输入资源标题"></el-input>
+      </el-form-item>
+      <el-form-item label="资源类型" >
+        <el-select v-model="updateForm.code"  placeholder="请选择">
+          <el-option  label="健康饮酒的正确姿势" value="0001"></el-option>
+          <el-option  label="含酒精的食品/药品/用品" value="0002"></el-option>
+          <el-option  label="客服路卡头像" value="0003"></el-option>
+          <el-option  label="客服人工头像" value="0004"></el-option>
+        </el-select>
+      </el-form-item>                  
+      <el-form-item label="资源内容">
+          <el-input type="textarea"  v-model="updateForm.content"></el-input>
+      </el-form-item>
+      <el-form-item label="资源附件">
+          <el-upload
+            action="#"
+            list-type="picture-card"
+            :on-remove="handleRemove2"
+            accept=".jpg,.jpeg,.png"
+            :file-list="updateForm.filesList"
+            :on-change="handleChange2"
+            :http-request="httpRequest2">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="sure">
+      <el-button type="primary" @click="updateds" v-loading.fullscreen.lock="fullscreenLoading">修改</el-button>
+      
+    </div>
+  </el-dialog>
+
+  <el-dialog
+  title="提示"
+  :visible.sync="dialogVisible"
+  width="20%">
+    <span>确认要删除吗？</span>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="remove">确 定</el-button>
+    </span>
+  </el-dialog>
+</div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+import MixinItem from '../Mixins/Mixins'
+
+export default {
+//import引入的组件需要注入到对象中才能使用
+name:"resource",
+components: {},
+mixins:[MixinItem],
+inject:["reload"],
+data() {
+//这里存放数据
+return {
+  code:"",
+  resourcesList:[],
+  addForm:{
+    title:"",
+    code:"",
+    content:"",
+    filesList:[],
+  },
+  updateForm:{
+    resourceId:"",
+    title:"",
+    code:"",
+    content:"",
+    filesList:[],
+  },
+  uptfiles:[],
+  addModal:false,
+  updateModal:false,
+  dialogVisible:false,
+  resourceId:"",
+  param:"",
+  uploadedFile:{},
+  fullscreenLoading:false,
+};
+},
+//监听属性 类似于data概念
+computed: {},
+//监控data中的数据变化
+watch: {},
+//方法集合
+methods: {
+  handleRemove(file, fileList) {
+    console.log(file, fileList);
+    this.addForm.filesList = fileList;
+  },
+  handleChange(file, fileList){
+    console.log(file, fileList);
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isSame = this.addForm.filesList.findIndex(item => item.filename = file.name)
+    //console.log(isSame)
+    if(!isLt2M){
+        this.warning('上传图片不能超过2MB!')
+        return false;
+    }else if(isSame != -1){
+        this.warning('上传图片名不能相同！')
+    }else{
+        this.addForm.filesList = fileList;
+        return true;
+    }
+  },
+  httpRequest(data){
+    console.log(data)
+    //this.addForm.filesList.push(data.file)
+  },
+  handleRemove2(file, fileList) {
+    console.log(file, fileList);
+    this.updateForm.filesList = fileList;
+  },
+  handleChange2(file, fileList){
+    //console.log(file, fileList);
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isSame = this.addForm.filesList.findIndex(item => item.filename = file.name)
+    console.log(isSame)
+    if(!isLt2M){
+        this.warning('上传图片不能超过2MB!')
+        return false;
+    }else if(isSame != -1){
+        this.warning('上传图片名不能相同！')
+    }else{
+        this.updateForm.filesList = fileList;
+        return true;
+    }
+  },
+  httpRequest2(data){
+    console.log(data)
+    //this.addForm.filesList.push(data.file)
+  },
+  getresourcesList(){
+    this.$axios({
+        method:"get",
+        url:`${this.$ip}/v1/management/resources/list?code=${this.code}`        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.resourcesList = data.data;
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  created(){
+    var param = new FormData();
+    param.append("title",this.addForm.title)
+    param.append("code",this.addForm.code)
+    param.append("content",this.addForm.content)
+    //param.append("files",this.addForm.filesList)
+		this.addForm.filesList.forEach(
+			(val) => {
+				param.append("files", val.raw);
+			}
+		);
+
+    this.$axios({
+        method:"POST",
+        headers: {'Content-Type': 'multipart/form-data'},
+        url:`${this.$ip}/v1/management/resources/add`,
+        data:param        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.success('上传成功！')
+            this.reload()
+            this.addModal = false
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  clear(){
+    this.addForm.title = "";
+    this.addForm.code = "";
+    this.addForm.content = "";
+    this.addForm.filesList = [];
+  },
+  create(){
+    this.addModal = true
+  },
+  update(row){
+
+    console.log(row)
+    this.updateForm = row;
+    let filesList = row.attachments.map(val =>{
+      let obj = {};
+      obj.url = val.attachmentUrl;
+      obj.name = this.getFileName(val.attachmentUrl)
+      return obj;
+    })
+    //this.imgUrlToFile(filesList[0].url);
+    this.uptfiles = filesList;
+    this.updateForm.filesList = filesList;
+    console.log(this.updateForm)
+    this.updateModal = true;
+  },
+  createparm(){
+    return new Promise((resolve) => {
+      let isEqualN = JSON.stringify(this.uptfiles) === JSON.stringify(this.updateForm.filesList); 
+      var param = new FormData();
+      param.append("resourceId",this.updateForm.resourceId)
+      param.append("title",this.updateForm.title)
+      param.append("code",this.updateForm.code)
+      param.append("content",this.updateForm.content)
+      //param.append("files",this.addForm.filesList)
+      if(!isEqualN){
+        this.updateForm.filesList.forEach(
+          async (val) => {
+            
+            if(val.status == "success"){
+              // alert(this.imgUrlToFile(val.url))
+              //console.log(this.imgUrlToFile(val.url))
+              // let data = this.imgUrlToFile(val.url)
+              // data.then(res =>{
+              //   console.log(res)
+                
+              // })
+              let result = await this.imgUrlToFile(val.url);
+              console.log(result)
+              if(result){
+                param.append("files",result);
+              }
+              // result.then(res =>{         
+              //   this.uploadedFile = res;
+              //   console.log(this.uploadedFile)
+              // })
+              
+            }else{
+              //alert(val.raw)
+              console.log(val.raw)
+              param.append("files", val.raw);
+            }
+          }
+        );
+      }
+      setTimeout(() =>{
+        resolve(param)
+      },1000)      
+    })
+    
+  },
+  updateds(){
+    //async
+    this.fullscreenLoading = true;
+    let result = this.createparm()
+		result.then(res =>{
+      console.log('123')
+      let param = res;
+      this.$axios({
+        method:"POST",
+        headers: {'Content-Type': 'multipart/form-data'},
+        url:`${this.$ip}/v1/management/resources/update`,
+        data:param        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.fullscreenLoading = false;
+            this.success('更新资源成功！')
+            this.reload()
+            this.updateModal = false
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    })
+  },
+  deleted(row){
+    console.log(row)
+    this.resourceId = row.resourceId;
+    this.dialogVisible = true;
+  },
+  remove(){
+    this.$axios({
+        method:"post",
+        url:`${this.$ip}/v1/management/resources/remove/${this.resourceId}`        
+      }).then(res => {
+        if(res.data){
+          let data = res.data;
+          if(data.code == "E_0000_0000"){
+            this.success('删除成功!');
+            this.dialogVisible = false;
+            this.reload()
+          }else if(data.code == "E_0000_0402"){
+            this.Timeoutalert()
+          }else{
+            this.warning(data.msg)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  success(val) {
+    this.$message({
+      message: val,
+      type: "success"
+    });
+  },
+  warning(val) {
+    this.$message.error(`Error：${val}`);
+  }
+},
+//生命周期 - 创建完成（可以访问当前this实例）
+created() {
+  this.getresourcesList()
+},
+//生命周期 - 挂载完成（可以访问DOM元素）
+mounted() {
+
+},
+beforeCreate() {}, //生命周期 - 创建之前
+beforeMount() {}, //生命周期 - 挂载之前
+beforeUpdate() {}, //生命周期 - 更新之前
+updated() {}, //生命周期 - 更新之后
+beforeDestroy() {}, //生命周期 - 销毁之前
+destroyed() {}, //生命周期 - 销毁完成
+activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
+}
+</script>
+<style lang='less' scoped>
+//@import url(); 引入公共css类
+  .resource{
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+
+    .top{
+      width: 100%;
+      height: 60px;
+
+      /deep/ .el-button{
+        float: left;
+        margin-left: 10px;
+        width: 200px;
+        height: 40px;
+        margin-top: 10px;
+      }
+
+      .code{
+        float: left;
+        width: 250px;
+        height: 40px;
+        margin-left: 50px;
+        margin-top: 10px;
+      }
+    }
+
+    .listTable{
+      width: 100%;
+
+      ul{
+        list-style: none;
+        padding: 0px;
+        margin: 0px;
+        li{
+          float: left;
+
+          img{
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+
+    /deep/ .el-dialog{
+      width: 40%;
+
+      .el-input{
+        width: 300px;
+      }
+
+      .el-textarea{
+        width: 300px;
+        .el-textarea__inner{
+          height: 200px;
+        }
+      }
+    }
+  }
+</style>

@@ -1,0 +1,21 @@
+.problem {
+  table {
+    width:80%;
+    margin:20px auto 0px;
+    color: #000000;
+    tr th,tr td {
+      border:1px solid #acb1b3c5;      
+    }
+    tr th{
+      height:40px;
+      line-height:40px;
+      // background-color: #0095C6;
+      // background-color: #d5d5d5;
+      background-color: #d5d5d5;
+    }
+    tr td{
+      height:60px;
+      line-height:60px;
+    }
+  }
+}

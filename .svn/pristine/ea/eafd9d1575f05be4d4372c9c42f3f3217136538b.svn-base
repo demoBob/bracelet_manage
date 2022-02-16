@@ -1,0 +1,107 @@
+<!--  -->
+<template>
+<div>
+<div class="top">
+  <img src="../../static/images/logo.png" class="company_logo"/>
+  <label class="title">CEM运动健康管理系统</label>
+  <el-tooltip class="item" effect="light" content="登出系统" placement="bottom">
+      <img src="../../static/images/user.png" class="user_logo" alt="登出系统" @click="dialogVisible = true"/>
+  </el-tooltip>
+  <el-popover
+  placement="top"
+  width="160"
+  v-model="visible">
+  <p>这是一段内容这是一段内容确定删除吗？</p>
+  <div style="text-align: right; margin: 0">
+    <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+    <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
+  </div>
+  <img src="../../static/images/user.png" class="user_logo" alt="登出系统" @click="dialogVisible = true"/>
+</el-popover>
+  <label class="user">admin</label>
+</div>
+<div class='layout'>
+  <div class="side clearfix">
+      <router-link to="/resource" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-dashboard.png" alt=""> -->
+        <div>资源</div>
+      </router-link>
+      <router-link to="/fixed_phrase" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>固定短语</div>
+      </router-link>
+       <router-link to="/topic" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>专题管理</div> 
+      </router-link>
+      <router-link to="/article" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>文章管理</div>
+      </router-link>
+      <router-link to="/problem" class="nav clearfix">
+        <!-- <img src="../../static/img/icon-history.png" jalt=""> -->
+        <div>问题管理</div>
+      </router-link>
+    </div>
+    <router-view class="main"></router-view>
+</div>
+
+<el-dialog
+  title="退出登录"
+  :visible.sync="dialogVisible"
+  width="30%">
+  <span>确定要退出登录吗？</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+  </span>
+</el-dialog>
+
+</div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+name:'layout',
+//import引入的组件需要注入到对象中才能使用
+components: {},
+data() {
+//这里存放数据
+return {
+  dialogVisible: false
+};
+},
+//监听属性 类似于data概念
+computed: {},
+//监控data中的数据变化
+watch: {},
+//方法集合
+methods: {
+  loginOut(){
+    alert("退出系统");
+  }
+},
+//生命周期 - 创建完成（可以访问当前this实例）
+created() {
+
+},
+//生命周期 - 挂载完成（可以访问DOM元素）
+mounted() {
+
+},
+beforeCreate() {}, //生命周期 - 创建之前
+beforeMount() {}, //生命周期 - 挂载之前
+beforeUpdate() {}, //生命周期 - 更新之前
+updated() {}, //生命周期 - 更新之后
+beforeDestroy() {}, //生命周期 - 销毁之前
+destroyed() {}, //生命周期 - 销毁完成
+activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
+}
+</script>
+<style lang='less' scoped>
+//@import url(); 引入公共css类
+@import '/css/layout.less';
+</style>
